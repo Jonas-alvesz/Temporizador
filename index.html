@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temporizador</title>
+    <style>
+        body {
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            display: grid;
+            place-items: center;
+            background-color: #252527; /* Cor de fundo para telas menores */
+        }
+
+        audio {
+            display: none;
+        }
+
+        #container {
+            width: 300px;
+            height: 205px;
+            background-color: #242526; /* Cor do container */
+            border-radius: 10px;
+            box-shadow: -3px 3px 10px rgba(139, 138, 138, 0.527); /* Sombra */
+        }
+
+        #escolha {
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            gap: 100px;
+        }
+
+        .tempo {
+            color: white;
+            background-color: #c9c9c9; /* Cor de fundo dos elementos de escolha */
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        #resultado {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        button {
+            border: none;
+            color: white;
+            background-color: #007bff; /* Cor de fundo do botão "Começar" */
+            padding: 8px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #parar {
+            display: none;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        /* Estilo para o botão "Parar" */
+        #parar button {
+            background-color: #ff9500; /* Cor de fundo do botão "Parar" */
+            padding: 10px 20px; /* Ajuste de padding do botão "Parar" */
+            border-radius: 4px; /* Ajuste de borda do botão "Parar" */
+            cursor: pointer;
+        }
+
+        @media (max-width: 700px) {
+            /* Estilos para telas menores */
+            body {
+                background-color: #252527; /* Cor de fundo para telas menores */
+            }
+
+            #container {
+                width: 300px;
+                height: 205px;
+                background-color: #242526; /* Cor do container */
+                border-radius: 10px;
+                box-shadow: -3px 3px 10px rgba(139, 138, 138, 0.527); /* Sombra */
+            }
+
+            .tempo {
+                color: white;
+                background-color: #c9c9c9; /* Cor de fundo dos elementos de escolha */
+                padding: 5px;
+                border-radius: 5px;
+            }
+
+            #contador {
+                margin-top: 5px;
+                color: white;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <audio src="./Toque Homecoming (Samsung).mp3" id="audio"></audio>
+    <div id="container">
+
+        <div id="escolha">
+            <div id="c-minutos" class="tempo">
+                <h4>Minutos</h4>
+                <select id="minutos"></select>
+            </div>
+
+            <div id="c-segundos" class="tempo">
+                <h4>Segundos</h4>
+                <select id="segundos"></select>
+            </div>
+        </div>
+        <div id="resultado">
+            <button id="botao" onclick="get()">Começar</button>
+            <div id="contador"></div>
+            <div id="parar">
+                <button onclick="pararAudio()">Parar</button>
+            </div>
+        </div>
+
+    </div>
+    <script>
+        let audio = document.getElementById('audio');
+        let minutos = document.getElementById('minutos');
+        let segundos = document.getElementById('segundos');
+        let contador = document.getElementById('contador');
+        let botao = document.getElementById('botao');
+        let parar = document.getElementById('parar');
+        let intervaloPrincipal; // Variável para armazenar o intervalo principal
+        let intervaloAudio; // Variável para armazenar o intervalo de repetição do áudio
+
+        for (let i = 0; i <= 60; i++) {
+            let value = i < 10 ? '0' + i : i;
+            minutos.innerHTML += `<option value="${i}">${value}</option>`;
+            segundos.innerHTML += `<option value="${i}">${value}</option>`;
+        }
+
+        function get() {
+            let vMinutos = parseInt(minutos.value);
+            let vSegundos = parseInt(segundos.value);
+            contador.innerHTML = `${vMinutos < 10 ? '0' + vMinutos : vMinutos}:${vSegundos < 10 ? '0' + vSegundos : vSegundos}`;
+
+            intervaloPrincipal = setInterval(() => {
+                if (vSegundos === 0 && vMinutos === 0) {
+                    clearInterval(intervaloPrincipal);
+                    audio.play();
+                    intervaloAudio = setInterval(function() {
+                        audio.currentTime = 0; // Reinicia o áudio para o início
+                        audio.play();
+                    }, 13000); // Repetir a cada 13 segundos
+                    parar.style.display = 'block';
+                    return;
+                }
+
+                if (vSegundos === 0) {
+                    vSegundos = 59;
+                    vMinutos--;
+                } else {
+                    vSegundos--;
+                }
+
+                contador.innerHTML = `${vMinutos < 10 ? '0' + vMinutos : vMinutos}:${vSegundos < 10 ? '0' + vSegundos : vSegundos}`;
+
+            }, 1000);
+        }
+
+        function pararAudio() {
+            audio.pause();
+            clearInterval(intervaloPrincipal);
+            clearInterval(intervaloAudio);
+            audio.currentTime = 0;
+            parar.style.display = 'none';
+            contador.innerHTML = '';
+        }
+    </script>
+
+</body>
+
+</html>
